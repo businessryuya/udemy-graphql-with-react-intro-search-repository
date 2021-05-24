@@ -1,17 +1,8 @@
 import React, { Component } from "react";
 import { ApolloProvider } from "react-apollo";
-import gql from 'graphql-tag';
-import {Query} from 'react-apollo'
+import { Query } from "react-apollo";
 import client from "./client";
-
-const ME = gql`
-query me {
-  user(login: "ryuyamatsuzawa") {
-    name
-    avatarUrl
-  }
-}
-`
+import { ME } from "./graphql";
 
 class App extends Component {
   render() {
@@ -20,15 +11,13 @@ class App extends Component {
         <div>hello, GraphQL</div>
 
         <Query query={ME}>
-          {
-            ({loading,error,data}) => {
-              if(loading) return 'Loading...'
-              if(error) return `Error! ${error.message}`
+          {({ loading, error, data }) => {
+            if (loading) return "Loading...";
+            if (error) return `Error! ${error.message}`;
 
-              return <div>{data.user.avatarUrl}</div>
-            }
-          }
-          </Query>
+            return <div>{data.user.avatarUrl}</div>;
+          }}
+        </Query>
       </ApolloProvider>
     );
   }
