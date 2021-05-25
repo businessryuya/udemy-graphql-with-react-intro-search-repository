@@ -42,8 +42,17 @@ class App extends Component {
     });
   }
 
+  goPrivious(search) {
+    this.setState({
+      first: null,
+      after: null,
+      last: PER_PAGE,
+      before: search.pageInfo.startCursor,
+    });
+  }
+
   render() {
-    const { query, first, before, after } = this.state;
+    const { query, first, last, before, after } = this.state;
     console.log({ query });
 
     return (
@@ -53,7 +62,7 @@ class App extends Component {
         </form>
         <Query
           query={SEARCH_REPOSITORIES}
-          variables={{ query, first, before, after }}
+          variables={{ query, first, last, before, after }}
         >
           {({ loading, error, data }) => {
             if (loading) return "Loading...";
@@ -79,7 +88,11 @@ class App extends Component {
                     );
                   })}
                 </ul>
-
+                {search.pageInfo.hasPreviousPage === true ? (
+                  <button onClick={this.goPrivious.bind(this, search)}>
+                    Previous
+                  </button>
+                ) : null}
                 {search.pageInfo.hasNextPage === true ? (
                   <button onClick={this.goNext.bind(this, search)}>Next</button>
                 ) : null}
