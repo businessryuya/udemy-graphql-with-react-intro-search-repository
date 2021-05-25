@@ -40,6 +40,16 @@ export const SEARCH_REPOSITORIES = gql
   }
 }`;
 
+export const ADD_STAR = gql`
+mutation addstar($input: AddStarInput!) {
+  addStar(input: $input) {
+    starrable {
+      id
+      viewerHasStarred
+    }
+  }
+}`
+
 export const ME = gql`
   query me {
     user(login: "businessryuya") {
