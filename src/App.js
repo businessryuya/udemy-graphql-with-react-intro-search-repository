@@ -15,29 +15,30 @@ const StarButton = (props) => {
           addOrRemoveStar({
             variables: { input: { starrableId: node.id } },
             // callbackを書く
-            update: (store, {data: { addStar, removeStar}}) => {
-              const { starrable } = addStar || removeStar
-              console.log(starrable)
+            update: (store, { data: { addStar, removeStar } }) => {
+              const { starrable } = addStar || removeStar;
+              console.log(starrable);
               const data = store.readQuery({
                 query: SEARCH_REPOSITORIES,
                 variables: { query, first, last, after, before },
               });
-              const edges = data.search.edges
-              const newEdges = edges.map(edge => {
-                if(edge.node.id === node.id) {
-                  const totalCount = edge.node.stargazers.totalCount
+              const edges = data.search.edges;
+              const newEdges = edges.map((edge) => {
+                if (edge.node.id === node.id) {
+                  const totalCount = edge.node.stargazers.totalCount;
                   // const diff = viewerHasStarred ? -1 : 1
-                  const diff = starrable.viewerHasStarred ? -1 : 1
-                  const newTotalCount = totalCount + diff
-                  edge.node.stargazers.totalCount = newTotalCount
+                  const diff = starrable.viewerHasStarred ? 1 : -1;
+                  const newTotalCount = totalCount + diff;
+                  edge.node.stargazers.totalCount = newTotalCount;
                 }
-                return edge
-              })
+                return edge;
+              });
               //casheに書き戻す
-              data.search.edges = newEdges
+              data.search.edges = newEdges;
               store.writeQuery({
-                query:SEARCH_REPOSITORIES,data
-              })
+                query: SEARCH_REPOSITORIES,
+                data,
+              });
             },
           });
         }}
@@ -61,7 +62,7 @@ const DEFAULT_STATE = {
   after: null,
   last: null,
   before: null,
-  query: "フロントエンドエンジニア",
+  query: "",
 };
 
 class App extends Component {
@@ -69,19 +70,18 @@ class App extends Component {
     super(props);
     this.state = DEFAULT_STATE;
 
-    this.handleChange = this.handleChange.bind(this);
+    this.myRef = React.createRef();
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleChange(event) {
+  handleSubmit(event) {
+    event.preventDefault();
+
     this.setState({
-      ...DEFAULT_STATE,
-      query: event.target.value,
+      // ここでquery更新出来る
+      query: this.myRef.current.value,
     });
   }
-
-  // handleSubmit(event) {
-  //   const {query, first, last,before,after} = this.state
-  // }
 
   goNext(search) {
     this.setState({
@@ -106,8 +106,9 @@ class App extends Component {
 
     return (
       <ApolloProvider client={client}>
-        <form>
-          <input value={query} onChange={this.handleChange} />
+        <form onSubmit={this.handleSubmit}>
+          <input ref={this.myRef} />
+          <input type="submit" value="Submit" />
         </form>
         <Query
           query={SEARCH_REPOSITORIES}
